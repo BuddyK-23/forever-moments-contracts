@@ -2,32 +2,31 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ethers } from "ethers";
 
 const main = () => {
-  if (existsSync("assets/metadata.json")) {
+  if (existsSync("assets/metadata2.json")) {
     console.log("`metadata.json` already exists in the assets folder.");
     return;
   }
 
-  const firstImage = readFileSync("assets/Butter.png").toString("hex");
-  const secondImage = readFileSync("assets/Sprinkle.png").toString("hex");
-  const iconImage = readFileSync("assets/icon.png").toString("hex");
+  const firstImage = readFileSync("assets/minecraft.jpg");
+  const secondImage = readFileSync("assets/serenity.jpg");
+  const thirdImage = readFileSync("assets/meme.jpg");
+  const fourthImage = readFileSync("assets/snow.jpg");
 
-  const name = "Munchkins";
-  const description = "A cute collection of Munchkins";
-  const links = [{ title: "Twitter", url: "https://twitter.com/" }];
-  const attributes = [
-    { key: "Unrevealed", value: true, type: "boolean" },
-    { key: "Background", value: "Yellow", type: "string" },
-    { key: "Age", value: 10, type: "number" },
+  const name = "Moments Factory";
+  const description = "Where Moments are made forever! This is your moment!";
+  const links = [
+    { title: "Twitter", url: "https://twitter.com/" },
+    { title: "Discord", url: "https://discord.com/" }
   ];
   const images = [
     [
       {
         width: 1024,
         height: 1024,
-        url: "ipfs://QmVfYb9D6x5hNuAaMa1qmoS2LmGi9Z78B1JKKaMyedv7wv/Butter.png",
+        url: "ipfs://bafkreiarzlokfitabbmouz7uxhdezs4e7gfwdiaosh6lyo362yijvvjnfi",
         verification: {
           method: "keccak256(bytes)",
-          hash: ethers.keccak256(`0x${firstImage}`),
+          hash: ethers.keccak256(firstImage),
         },
       },
     ],
@@ -35,10 +34,10 @@ const main = () => {
       {
         width: 1024,
         height: 1024,
-        url: "ipfs://QmZR5P4o322gTtAxsbt2gm93e7bYqBhnjaMog4HnjYmAFt/Sprinkle.png",
+        url: "ipfs://bafkreibi6rbyelahjqy6di7ghb6fn6bte4jp2e7mclbxpmno4u4tmh4v7a",
         verification: {
           method: "keccak256(bytes)",
-          hash: ethers.keccak256(`0x${secondImage}`),
+          hash: ethers.keccak256(secondImage),
         },
       },
     ],
@@ -47,11 +46,37 @@ const main = () => {
     {
       width: 1024,
       height: 1024,
-      url: "ipfs://QmPS3n3xe5gQsGpUnpaYWvzug44JknBZbUv6cv8yKJ7Gsi/icon.png",
+      url: "ipfs://bafkreihduxcbi5clq3olyyueyt5qmzdppqsbgaj3acxbrscmikuw2pqx5u",
       verification: {
         method: "keccak256(bytes)",
-        hash: ethers.keccak256(`0x${iconImage}`),
+        hash: ethers.keccak256(thirdImage),
       },
+    },
+  ];
+  const assets = [
+    {
+      url: "ipfs://bafkreiegiqfk5drf2wi5hy3b5dyv7fbpxyfqgu7sdrp5kegkytbah5kwr4",
+      fileType: "image/jpeg",
+      verification: {
+        method: "keccak256(bytes)",
+        data: ethers.keccak256(fourthImage),
+      },
+    },
+  ];
+  const attributes = [
+    {
+      key: "TestAttribute1",
+      value: JSON.stringify({
+        title: "TestTitle",
+        description: "TestDescription",
+        notes: "TestNotes",
+      }),
+      type: "string",
+    },
+    {
+      key: "TestAttribute2",
+      value: 1,
+      type: "number",
     },
   ];
 
@@ -60,14 +85,14 @@ const main = () => {
       name,
       description,
       links,
-      attributes,
       images,
       icon,
-      assets: [],
+      assets,
+      attributes,
     },
   };
 
-  writeFileSync("assets/metadata.json", JSON.stringify(json));
+  writeFileSync("assets/metadata2.json", JSON.stringify(json));
 };
 
 main();

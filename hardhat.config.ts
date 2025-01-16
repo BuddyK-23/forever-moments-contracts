@@ -8,12 +8,12 @@ const config: HardhatUserConfig = {
   networks: {
     lukso_testnet: {
       chainId: 4201,
-      url: "https://rpc.testnet.lukso.gateway.fm",
+      url: "https://4201.rpc.thirdweb.com",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     lukso_mainnet: {
       chainId: 42,
-      url: "https://rpc.lukso.gateway.fm",
+      url: "https://42.rpc.thirdweb.com",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
@@ -27,6 +27,10 @@ const config: HardhatUserConfig = {
       },
     },
   },
+
+  sourcify: {
+    enabled: true,
+  }
 };
 
 export default config;

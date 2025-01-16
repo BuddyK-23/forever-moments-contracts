@@ -6,10 +6,19 @@
   },
   "dependencies": {
     "@erc725/erc725.js": "^0.23.1",
+    "@lukso/data-provider-ipfs-http-client": "^0.1.0",
+    "@lukso/lsp-smart-contracts": "^0.15.0",
     "@lukso/lsp4-contracts": "^0.15.0",
     "@lukso/lsp8-contracts": "^0.15.0",
-    "dotenv": "^16.4.5",
-    "ethers": "^6.12.1"
+    "@thirdweb-dev/storage": "^2.0.15",
+    "cross-spawn": "^7.0.6",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.12.1",
+    "fs": "^0.0.1-security",
+    "isomorphic-fetch": "^3.0.0",
+    "pinata-web3": "^0.5.4",
+    "thirdweb": "^5.80.0",
+    "web3": "^4.16.0"
   },
   "scripts": {
     "build": "hardhat compile",
