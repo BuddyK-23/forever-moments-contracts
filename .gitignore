@@ -15,4 +15,4 @@ node_modules
 /coverage.json
 
 # Scripts
-/scripts
+scripts/
