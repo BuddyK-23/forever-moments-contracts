@@ -1,33 +1,66 @@
-import { ethers } from "hardhat";
+// import { ethers } from "hardhat";
+import { ethers as hardhatEthers } from "hardhat"; // Hardhat-specific helpers
+import { ethers } from "ethers"; // Standalone ethers for utilities
 import { config as LoadEnv } from "dotenv";
-import { createReadStream, readFileSync } from "fs";
-import { IPFSHttpClientUploader } from "@lukso/data-provider-ipfs-http-client";
+import { readFileSync } from "fs";
 import UniversalProfile from "@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json";
 import { ERC725 } from "@erc725/erc725.js";
+import { PinataSDK } from "pinata-web3";
+import { Blob } from "buffer";
 
 LoadEnv();
 
-const { IPFS_GATEWAY, PROFILE_ADDRESS, PUBLIC_KEY, PRIVATE_KEY } = process.env;
+const { IPFS_GATEWAY_URL, UP_ADDRESS, PUBLIC_KEY, PRIVATE_KEY, PINATA_JWT_KEY } = process.env;
+
+async function uploadToPinata(filePath: string): Promise<string> {
+  const pinata = new PinataSDK({
+    pinataJwt: PINATA_JWT_KEY as string,
+    pinataGateway: IPFS_GATEWAY_URL as string,
+  });
+
+  try {
+    const blob = new Blob([readFileSync(filePath)], { type: "application/json" });
+    const uploadResponse = await pinata.upload.file(blob);
+    console.log("Pinata upload successful:", uploadResponse);
+    return uploadResponse.IpfsHash; // Return only the IpfsHash
+    // return `ipfs://${uploadResponse.IpfsHash}`;
+  } catch (error) {
+    console.error("Pinata upload failed:", error);
+    throw new Error("Failed to upload to Pinata");
+  }
+}
 
 const main = async () => {
   try {
-    if (!IPFS_GATEWAY || !PROFILE_ADDRESS || !PUBLIC_KEY || !PRIVATE_KEY) {
+    if (!IPFS_GATEWAY_URL || !UP_ADDRESS || !PUBLIC_KEY || !PRIVATE_KEY) {
       console.error("Missing environment variables. Please ensure IPFS_GATEWAY, PROFILE_ADDRESS, PRIVATE_KEY and PUBLIC_KEY are set in .env.");
       return;
     }
+    
+    const provider = hardhatEthers.provider;
+    const signer = new hardhatEthers.Wallet(PRIVATE_KEY, provider);
 
-    // Step 1: Upload image to IPFS
-    const ipfsProvider = new IPFSHttpClientUploader('http://127.0.0.1:5001/api/v0/add');
-    const imageFile = createReadStream("assets/meme.jpg");
-    const { url: imageUrl, hash: imageHash } = await ipfsProvider.upload(imageFile);
-    console.log("Image uploaded:", imageUrl, imageHash);
+    console.log("Signer address:", signer.address);
+    console.log("Provider:", provider);
 
-    // Step 2: Upload JSON metadata to IPFS
-    const jsonFile = JSON.parse(readFileSync("assets/LSP3ProfileMetadata.json", "utf8"));
-    const { url: metadataUrl, hash: metadataHash } = await ipfsProvider.upload(jsonFile);
-    console.log("Metadata uploaded:", metadataUrl, metadataHash);
+    // Step 1: Upload metadata to Pinata
+    // const imagePath = "assets/profile-buddyk-barista.png";
+    // console.log("Uploading image to Pinata...");
+    // const imageUrl = await uploadToPinata(imagePath);
+    // console.log("Image uploaded to Pinata:", imageUrl);
 
-    // Step 3: Encode LSP3Profile data
+    const metadataPath = "assets/LSP3ProfileMetadata.json";
+    const metadataHash = await uploadToPinata(metadataPath);
+    console.log("Uploaded metadata hash:", metadataHash);
+
+    const metadataUrl = `ipfs://${metadataHash}`;
+    console.log("Metadata URL:", metadataUrl);
+
+    // Step 2: Read metadata JSON
+    const metadataJson = JSON.parse(readFileSync(metadataPath, "utf-8"));
+    console.log("Metadata JSON:", metadataJson);
+
+    //Step 3: Encode LSP3Profile data
     const schema = [
       {
         name: "LSP3Profile",
@@ -38,8 +71,8 @@ const main = async () => {
       },
     ];
 
-    const erc725 = new ERC725(schema, PROFILE_ADDRESS, ethers.provider, {
-      ipfsGateway: IPFS_GATEWAY,
+    const erc725 = new ERC725(schema, UP_ADDRESS, hardhatEthers.provider, {
+      ipfsGateway: IPFS_GATEWAY_URL,
     });
 
     const encodedData = erc725.encodeData([
@@ -49,16 +82,15 @@ const main = async () => {
           hashFunction: "keccak256(utf8)",
           hash: metadataHash,
           url: metadataUrl,
+          json: metadataJson, // Include the JSON metadata
         },
       } as any, // Bypass TypeScript type errors
     ]);
 
     console.log("Encoded data:", encodedData);
 
-    // Step 4: Update Universal Profile contract
-    const signer = await ethers.provider.getSigner(PRIVATE_KEY);
     const universalProfile = new ethers.Contract(
-      PROFILE_ADDRESS,
+      UP_ADDRESS,
       UniversalProfile.abi,
       signer
     );

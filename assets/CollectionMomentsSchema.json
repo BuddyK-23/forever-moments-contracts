@@ -1,0 +1,23 @@
+[
+  {
+    "name": "CollectionMoments:<address>:<uint128>",
+    "key": "0xe14d90f77cd10a6c0fcd843b4b5b6e1c",
+    "keyType": "MappingWithGrouping",
+    "valueType": "bytes32",
+    "valueContent": "TokenID"
+  },
+  {
+    "name": "CollectionMomentsCount:<address>",
+    "key": "0xe14d90f77cd10a6c0fcd843b4b5b6e1c0000<address>:Count",
+    "keyType": "Mapping",
+    "valueType": "uint128",
+    "valueContent": "Number"
+  },
+  {
+    "name": "CollectionMetadata",
+    "key": "0x9b0e98942544bc067f3b840ee04f2723790c73ddc65d21b7becbc68383f977d6",
+    "keyType": "Singleton",
+    "valueType": "bytes",
+    "valueContent": "VerifiableURI"
+  }
+]

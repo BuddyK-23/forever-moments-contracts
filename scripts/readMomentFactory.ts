@@ -1,9 +1,108 @@
+import axios from "axios";
+import { readFileSync } from "fs";
 import { ethers } from "hardhat";
 import { MomentFactory__factory } from "../typechain-types";
 import { config as LoadEnv } from "dotenv";
+import { ERC725 } from '@erc725/erc725.js';
+import LSP4DigitalAssetSchema from '@erc725/erc725.js/schemas/LSP4DigitalAsset.json';
+import LSP3ProfileSchema from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json';
+
 
 LoadEnv();
-const { UP_ADDRESS, MOMENT_FACTORY_ADDRESS, PUBLIC_KEY } = process.env;
+const { UP_ADDRESS, MOMENT_FACTORY_ADDRESS, PUBLIC_KEY, DEPLOYED_UP_ADDRESS } = process.env;
+
+// Function to fetch JSON from IPFS
+const fetchIPFSJson = async (ipfsUrl: string) => {
+  try {
+    // Replace "ipfs://" with your IPFS gateway URL
+    const ipfsGatewayUrl = ipfsUrl.replace(
+      "ipfs://",
+      "https://api.universalprofile.cloud/ipfs/"
+    );
+
+    console.log(`Fetching JSON from: ${ipfsGatewayUrl}`);
+
+    // Fetch the JSON data
+    const response = await axios.get(ipfsGatewayUrl);
+    console.log(`Fetched IPFS JSON:`, response.data);
+
+    return response.data; // Return the JSON data
+  } catch (error) {
+    console.error(`Error fetching IPFS data from ${ipfsUrl}:`, error);
+    return null;
+  }
+};
+
+const fetchMomentMetadata = async (
+  momentIds: string[],
+  momentMetadataSchema: any
+) => {
+  for (const momentId of momentIds) {
+    console.log(`Fetching metadata for moment: ${momentId}`);
+
+    // Convert bytes32 token ID to address (last 20 bytes)
+    const momentAddress = ethers.getAddress(`0x${momentId.slice(26)}`);
+
+    // Initialize ERC725.js for the moment
+    const erc725js = new ERC725(
+      [...momentMetadataSchema, ...LSP4DigitalAssetSchema],
+      momentAddress, // Moment address derived from tokenId
+      "https://rpc.testnet.lukso.network/",
+      {
+        ipfsGateway: "https://api.universalprofile.cloud/ipfs",
+      }
+    );
+
+    try {
+      // Fetch metadata for the moment
+      const metadata = await erc725js.getData();
+      console.log(`Metadata for moment ${momentId}:`, metadata);
+
+      // Find the IPFS URL in the metadata 
+      const ipfsUrl = metadata.find(
+        (data) => data.name === "MomentMetadata"
+      )?.value?.url;
+
+      if (ipfsUrl) {
+        console.log(`Found IPFS URL: ${ipfsUrl}`);
+
+        // Fetch JSON from IPFS
+        const ipfsJson = await fetchIPFSJson(ipfsUrl);
+
+        // Do something with the fetched JSON
+        console.log(`Fetched IPFS JSON Data:`, ipfsJson);
+      } else {
+        console.log("No IPFS URL found in metadata.");
+      }
+
+
+    } catch (error) {
+      console.error(`Error fetching metadata for moment ${momentId}:`, error);
+    }
+  }
+};
+
+const getCollectionsByOwner = async (momentFactory: any, ownerAddress: string) => {
+  try {
+    console.log(`\n📋 Fetching collections owned by: ${ownerAddress}`);
+    const collections = await momentFactory.getCollectionsByOwner(ownerAddress);
+    
+    if (collections.length === 0) {
+      console.log(`No collections found for owner: ${ownerAddress}`);
+      return [];
+    }
+    
+    console.log(`Found ${collections.length} collections for owner ${ownerAddress}:`);
+    collections.forEach((collection: string, index: number) => {
+      console.log(`Collection ${index + 1}: ${collection}`);
+    });
+    
+    return collections;
+  } catch (error) {
+    console.error(`Error fetching collections for owner ${ownerAddress}:`, error);
+    return [];
+  }
+};
 
 const main = async () => {
   try {
@@ -18,58 +117,136 @@ const main = async () => {
     // Connect to the deployed MomentFactory contract
     const momentFactory = MomentFactory__factory.connect(MOMENT_FACTORY_ADDRESS, provider);
 
+    // Load the Moments schema
+    const schemaPath = "assets/MomentMetadataSchema.json";
+    const MomentMetadataSchema = JSON.parse(readFileSync(schemaPath, "utf8"));
+
+    // -------- 1. Fetch Metadata for Moments in a Specific Collection --------
+    // try {
+    //   console.log(`Fetching moments for collection: ${DEPLOYED_UP_ADDRESS}`);
+
+    //   const momentsInCollection = await momentFactory.getMomentsInCollection(
+    //     DEPLOYED_UP_ADDRESS
+    //   );
+
+    //   if (momentsInCollection.length === 0) {
+    //     console.log(
+    //       `No moments found in the collection: ${DEPLOYED_UP_ADDRESS}`
+    //     );
+    //   } else {
+    //     console.log(
+    //       `Moments in collection ${DEPLOYED_UP_ADDRESS}:`,
+    //       momentsInCollection
+    //     );
+
+    //     await fetchMomentMetadata(momentsInCollection, MomentMetadataSchema);
+    //   }
+    // } catch (error) {
+    //   console.error(
+    //     `Error fetching moments for collection ${DEPLOYED_UP_ADDRESS}:`,
+    //     error
+    //   );
+    // }
+
+    // -------- Fetch Metadata for All Moments Owned by the Address --------
+    // console.log(`Fetching moments owned by: ${UP_ADDRESS}`);
+
+    // const tokenIdsOwned = await momentFactory.tokenIdsOf(UP_ADDRESS);
+    // console.log(`Tokens owned by ${UP_ADDRESS}:`, tokenIdsOwned);
+
+    // if (tokenIdsOwned.length === 0) {
+    //   console.log(`No moments owned by ${UP_ADDRESS}.`);
+    // } else {
+    //   await fetchMomentMetadata(tokenIdsOwned, MomentMetadataSchema);
+    // }
+    // console.log("Completed fetching all moment metadata.");
+    
+    // Load the Collection schema
+    const collectionSchemaPath = "assets/CollectionMomentsSchema.json";
+    const CollectionMomentsSchema = JSON.parse(readFileSync(collectionSchemaPath, "utf8"));
+
     // Fetch total supply of tokens
     const totalSupply = await momentFactory.totalSupply();
-    console.log(`Total supply of tokens: ${totalSupply}`);
+    console.log(`Total Moments minted: ${totalSupply}`);
 
     // Fetch token IDs owned by UP_ADDRESS
     const tokenIds = await momentFactory.tokenIdsOf(UP_ADDRESS);
     console.log(`Tokens owned by ${UP_ADDRESS}:`, tokenIds);
 
     if (tokenIds.length === 0) {
-      console.log("No tokens owned by the UP_ADDRESS.");
+      console.log("No Moments owned by UP_ADDRESS.");
       return;
     }
 
-    // LSP4 Metadata Key
-    const metadataKey = "0x9afb95cacc9f95858ec44aa8c3b685511002e30ae54415823f406128b85b238e"; // _LSP4_METADATA_KEY
+    // Fetch total number of collections
+    const totalCollections = await momentFactory.getTotalCollections();
+    console.log(`Total collections: ${totalCollections}`);
 
-    // Check factory-level metadata
+    // Fetch all collection IDs
+    const collectionIds = await momentFactory.getAllCollections();
+    console.log(`All collections:`, collectionIds);
+
+    // Loop through each collection and fetch its metadata
+    // for (const collectionAddress of collectionIds) {
+    //   console.log(`Fetching metadata for collection: ${collectionAddress}`);
+
+    //   // Initialize ERC725.js for the current collection
+    //   const erc725js = new ERC725(
+    //     [...CollectionMomentsSchema, ...LSP3ProfileSchema, ...LSP4DigitalAssetSchema],
+    //     collectionAddress, // Current collection address
+    //     'https://rpc.testnet.lukso.network/',
+    //     {
+    //       ipfsGateway: 'https://api.universalprofile.cloud/ipfs',
+    //     },
+    //   );
+
+    //   try {
+    //     // Fetch metadata for the collection
+    //     const metadata = await erc725js.getData();
+    //     console.log(`Metadata for collection ${collectionAddress}:`, metadata);
+
+  
+    //     // Find the IPFS URL in the metadata 
+    //     const ipfsUrl = metadata.find(
+    //       (data) => data.name === "LSP3Profile"
+    //     )?.value?.url;
+
+    //     if (ipfsUrl) {
+    //       console.log(`Found IPFS URL: ${ipfsUrl}`);
+
+    //       // Fetch JSON from IPFS
+    //       const ipfsJson = await fetchIPFSJson(ipfsUrl);
+
+    //       // Do something with the fetched JSON
+    //       console.log(`Fetched IPFS JSON Data:`, ipfsJson);
+    //     } else {
+    //       console.log("No IPFS URL found in metadata.");
+    //     }
+    //   } catch (error) {
+    //     console.error(`Error fetching metadata for collection ${collectionAddress}:`, error);
+    //   }
+    // }
+
     try {
-      const factoryMetadata = await momentFactory.getData(metadataKey);
-      if (factoryMetadata && factoryMetadata.length > 0) {
-        console.log("Factory Metadata (URI):", ethers.utils.toUtf8String(factoryMetadata));
+      const moments = await momentFactory.getMomentsInCollection(DEPLOYED_UP_ADDRESS);
+      if (moments.length === 0) {
+        console.log(`No moments found for collection: ${DEPLOYED_UP_ADDRESS}`);
       } else {
-        console.log("No factory metadata found.");
+        console.log(`Moments in collection ${DEPLOYED_UP_ADDRESS}:`, moments);
       }
     } catch (error) {
-      console.error("Error fetching factory metadata:", error);
+      console.error(`Error fetching moments for collection ${DEPLOYED_UP_ADDRESS}:`, error);
     }
 
-    for (const tokenId of tokenIds) {
-      try {
-        // Fetch token owner for each tokenId
-        const tokenOwner = await momentFactory.tokenOwnerOf(tokenId);
-        console.log(`Token ID ${tokenId} is owned by: ${tokenOwner}`);
-
-        // Fetch all operators for the tokenId
-        const operators = await momentFactory.getOperatorsOf(tokenId);
-        console.log(`Operators for token ID ${tokenId}:`, operators);
-
-        try {
-          const tokenMetadata = await momentFactory.getDataForTokenId(tokenId, metadataKey);
-          if (tokenMetadata && tokenMetadata.length > 0) {
-            console.log(`Metadata for token ID ${tokenId}:`, ethers.utils.toUtf8String(tokenMetadata));
-          } else {
-            console.log(`No metadata found for token ID ${tokenId}.`);
-          }
-        } catch (error) {
-          console.error(`Error querying metadata for token ID ${tokenId}:`, error);
-        }
-      } catch (error) {
-        console.error(`Error querying tokenOwnerOf or getOperatorsOf for token ID ${tokenId}:`, error);
-      }
-    }
+    // Fetch collections owned by UP_ADDRESS
+    const ownedCollections = await getCollectionsByOwner(momentFactory, UP_ADDRESS);
+    console.log(`Collections owned by ${UP_ADDRESS}:`, ownedCollections);
+    
+    //If you want to fetch collections for another address too:
+    const otherAddress = "0x77B310FCcCd587Bf0582136b98694550Ee322E0F";
+    const otherAddressCollections = await getCollectionsByOwner(momentFactory, otherAddress);
+    console.log(`Collections owned by ${otherAddress}:`, otherAddressCollections);
+    
   } catch (error) {
     console.error("Error reading data from MomentFactory:", error);
   }

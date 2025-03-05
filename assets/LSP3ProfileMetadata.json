@@ -1,21 +1,37 @@
 {
   "LSP3Profile": {
-    "name": "buddyk",
-    "description": "Congratulations! You have successfully edited your profile!",
+    "name": "buddykbarista",
+    "description": "I'm an owl barista at Starbucks. I'm a coffee lover and I'm a coffee expert. I'm a coffee lover and I'm a coffee expert. I'm a coffee lover and I'm a coffee expert. I'm a coffee lover and I'm a coffee expert.",
     "links": [
       {
-        "title": "Website",
-        "url": "https://mywebsite.me"
+        "title": "Forever Moments",
+        "url": "https://forever-moments.vercel.app/"
+      },
+      {
+        "title": "Twitter",
+        "url": "https://twitter.com/InfluencerHandle"
+      },
+      {
+        "title": "Instagram",
+        "url": "https://instagram.com/InfluencerHandle"
+      },
+      {
+        "title": "TikTok",
+        "url": "https://tiktok.com/@InfluencerHandle"
+      },
+      {
+        "title": "YouTube",
+        "url": "https://youtube.com/@InfluencerHandle"
       }
     ],
-    "tags": ["Public Profile"],
+    "tags": ["Fashion", "Luxury", "Gucci", "Design", "Influencer"],
     "profileImage": [
       {
         "width": 640,
         "height": 609,
         "hashFunction": "keccak256(bytes)",
-        "hash": "0xe459e5769af85b09fb43bb8eaac561e196d58c0f5da3c5e150b6695898089402",
-        "url": "ipfs://QmPCz896rcZmq8F3FuUkJinRUmPgnZGjPvZL71nAaL7Fsx"
+        "hash": "0x2d7493d44a1778e560fcf5e25d5610f91e6be070868b152827c6e5b4c4e3232c",
+        "url": "ipfs://bafybeihsuvf3jjsaipuvbsb2te3uecl3ott3ahonzbgilei3hsghuql4b4"
       }
     ],
     "backgroundImage": [
@@ -23,8 +39,8 @@
         "width": 1024,
         "height": 576,
         "hashFunction": "keccak256(bytes)",
-        "hash": "0x1c19780d377a7b01f7dcf16e0ebffd225e29d2235625009f67cf9d86a32a79e1",
-        "url": "ipfs://QmPMmEpKnmgACsWjhDUheF8TEKpspzQhAkjbY4EBbR4jgP"
+        "hash": "0x6177b5c099fae534d83308b4e71b5d1810d2b1f125efe8e09cb093e605d43513",
+        "url": "ipfs://bafybeicfzbqoytn3jie3bq6bmlnfjjodl2aq7jgl54jnqgdblawr7eokga"
       }
     ]
   }

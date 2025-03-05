@@ -29,7 +29,7 @@ async function uploadToPinata(filePath: string): Promise<string> {
 }
 
 const main = async () => {
-  const filePath = "./assets/snow.jpg"; // Change this to your file path
+  const filePath = "./assets/likesTokenBackground.jpg"; // Change this to your file path
   try {
     console.log("Uploading file to IPFS...");
     const ipfsUrl = await uploadToPinata(filePath);

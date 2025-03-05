@@ -8,7 +8,7 @@ const config: HardhatUserConfig = {
   networks: {
     lukso_testnet: {
       chainId: 4201,
-      url: "https://4201.rpc.thirdweb.com",
+      url: "https://rpc.testnet.lukso.network/",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     lukso_mainnet: {
@@ -24,13 +24,13 @@ const config: HardhatUserConfig = {
       optimizer: {
         enabled: true,
         runs: 200,
-      },
+      }
     },
   },
 
   sourcify: {
     enabled: true,
-  }
+  },
 };
 
 export default config;

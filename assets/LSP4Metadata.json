@@ -1,0 +1,58 @@
+{
+  "LSP4Metadata": {
+    "name": "A Month in Gucci",
+    "description": "Will it work? Maybe? Visit my Forever Moments' Gucci collection. A behind-the-scenes journey through the artistry, design, and culture that define Gucci.",
+    "links": [
+      {
+        "title": "X",
+        "url": "https://x.com/momentsonchain"
+      },
+      {
+        "title": "Forever Moments",
+        "url": "https://forever-moments.vercel.app/"
+      }
+    ],
+    "images": [
+      [
+        {
+          "width": 1024,
+          "height": 1024,
+          "url": "ipfs://bafybeier26hh6dctzf7hmjiswa5bvi2kx7il6ojxaryti4l5sbkssmtleu",
+          "verification": {
+            "method": "keccak256(bytes)",
+            "data": "0x62ca74fe01ebc90df7d00bea3a8e38663e7686948b5524f7685589231c8ad155"
+          }
+        }
+      ]
+    ],
+    "icon": [
+      {
+        "width": 1024,
+        "height": 1024,
+        "url": "ipfs://bafybeier26hh6dctzf7hmjiswa5bvi2kx7il6ojxaryti4l5sbkssmtleu",
+        "verification": {
+          "method": "keccak256(bytes)",
+          "data": "0x62ca74fe01ebc90df7d00bea3a8e38663e7686948b5524f7685589231c8ad155"
+        }
+      }
+    ],
+    "assets": [],
+    "attributes": [
+      {
+        "key": "Theme",
+        "value": "Luxury Fashion & Design",
+        "type": "string"
+      },
+      {
+        "key": "Creator",
+        "value": "Influencer Name",
+        "type": "string"
+      },
+      {
+        "key": "Collection Type",
+        "value": "Behind-the-Scenes",
+        "type": "string"
+      }
+    ]
+  }
+}

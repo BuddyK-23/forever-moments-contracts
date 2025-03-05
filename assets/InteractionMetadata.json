@@ -1,0 +1,74 @@
+{
+  "InteractionMetadata": {
+    "likes": [
+      {
+        "liker": "0xabcdef1234567890abcdef1234567890abcdef23",
+        "timestamp": 1707053473
+      },
+      {
+        "liker": "0x1234567890abcdef1234567890abcdef12345623",
+        "timestamp": 1707053500
+      }
+    ],
+    "dislikes": [
+      {
+        "disliker": "0x9876543210abcdef9876543210abcdef98765423",
+        "timestamp": 1707053600
+      },
+      {
+        "disliker": "0xabcdef1234567890abcdef1234567890abcdef12",
+        "timestamp": 1707053620
+      }
+    ],
+    "comments": [
+      {
+        "commentId": "0x1a2b3c4d5e6f7g8h9i0j",
+        "author": "0x1234567890abcdef1234567890abcdef12345678",
+        "content": "This moment is the best update ever 22222222",
+        "timestamp": 1707053473,
+        "replies": [
+          {
+            "commentId": "0x2b3c4d5e6f7g8h9i0j1a",
+            "author": "0xabcdef1234567890abcdef1234567890abcdef12",
+            "content": "I bunga bunga!",
+            "timestamp": 1707053500
+          }
+        ],
+        "likes": [
+          {
+            "liker": "0xabcdef1234567890abcdef1234567890abcdef12",
+            "timestamp": 1707053555
+          },
+          {
+            "liker": "0x1234567890abcdef1234567890abcdef12345678",
+            "timestamp": 1707053560
+          }
+        ],
+        "dislikes": [
+          {
+            "disliker": "0x9876543210abcdef9876543210abcdef98765432",
+            "timestamp": 1707053580
+          },
+          {
+            "disliker": "0xabcdef1234567890abcdef1234567890abcdef12",
+            "timestamp": 1707053590
+          }
+        ]
+      },
+      {
+        "commentId": "0x3c4d5e6f7g8h9i0j1a2b",
+        "author": "0x9876543210abcdef9876543210abcdef98765432",
+        "content": "Not sure I like this one 🤔",
+        "timestamp": 1707053600,
+        "replies": [],
+        "likes": [],
+        "dislikes": [
+          {
+            "disliker": "0x1234567890abcdef1234567890abcdef12345678",
+            "timestamp": 1707053650
+          }
+        ]
+      }
+    ]
+  }
+}

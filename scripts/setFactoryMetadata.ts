@@ -1,6 +1,5 @@
 import { readFileSync } from "fs";
 import { ethers } from "hardhat";
-import { toBeHex } from "ethers";
 import { MomentFactory__factory } from "../typechain-types";
 import { config as LoadEnv } from "dotenv";
 import { ERC725 } from "@erc725/erc725.js";
@@ -15,7 +14,7 @@ const { PRIVATE_KEY, UP_ADDRESS, MOMENT_FACTORY_ADDRESS, PINATA_JWT_KEY, IPFS_GA
 async function uploadToPinata(filePath: string): Promise<string> {
   const pinata = new PinataSDK({
     pinataJwt: PINATA_JWT_KEY as string,
-    pinataGateway: IPFS_GATEWAY_URL as string,
+    pinataGateway: IPFS_GATEWAY_URL as string, 
   });
 
   try {
@@ -46,8 +45,8 @@ const main = async () => {
   console.log("Signer Address:", signer.address);
 
   // Read metadata JSON file
-  const metadataPath = "assets/metadata2.json";
-  const metadataJson = readFileSync(metadataPath, "utf-8");
+  const metadataPath = "assets/FactoryMetadata.json";
+  const metadataJson = JSON.parse(readFileSync("assets/FactoryMetadata.json").toString());
 
   console.log("Uploading metadata to Pinata...");
   let metadataUrl: string;
@@ -65,7 +64,7 @@ const main = async () => {
     {
       keyName: "LSP4Metadata",
       value: {
-        json: JSON.parse(metadataJson),
+        json: metadataJson,
         url: metadataUrl,
       },
     },
@@ -75,18 +74,18 @@ const main = async () => {
 
   // Call the setFactoryDatata function
   try {
-    const tx = await momentFactory.setFactoryData(encodedMetadataURI.values[0]);
+    const tx = await momentFactory.setMomentFactoryData(encodedMetadataURI.values[0]);
     console.log("Transaction sent, waiting for confirmation...");
     const receipt = await tx.wait(1);
-    console.log("Set data transaction confirmed! Transaction hash:", receipt.transactionHash);
+    if (receipt) {
+      console.log("Set data transaction confirmed! Transaction hash:", receipt.hash);
+      console.log("Transaction Receipt:", receipt);
+    } else {
+      console.error("Transaction receipt is null or undefined.");
+    }
   } catch (txError) {
     console.error("Failed to set metadata on the blockchain:", txError);
   }
-  // const tx = await momentFactory.setFactoryData(encodedMetadataURI.values[0]);
-  // console.log("Transaction sent, waiting for confirmation...");
-  // const receipt = await tx.wait(1);
-
-  // console.log("Set data transaction confirmed!");
 };
 
 main().catch((error) => {
