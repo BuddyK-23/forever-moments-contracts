@@ -1,1 +1,39 @@
-{"LSP4Metadata":{"name":"LIKES Token","description":"Social media token for the likes of the world","links":[{"title":"X","url":"https://x.com/momentsonchain"},{"title":"Forever Moments","url":"https://forever-moments.vercel.app/"}],"images":[[{"width":1024,"height":403,"url":"ipfs://bafybeie2jmiilaqtvmufvmci2g5q3eaktzewz3mf6tpkpvvhpzbt7ewyym","verification":{"method":"keccak256(bytes)","data":"0x71bae9f3dd156c866d721d52eaa5551a2c14086d27c106c3b3f7c2b664eb8f0d"}}]],"icon":[{"width":400,"height":400,"url":"ipfs://bafkreifxiiu6dafpo2333ntjg34jhqxfhymdbbzawyqmcrkvk5ci53jrni","verification":{"method":"keccak256(bytes)","data":"0x3ea569ede4c21021116908bd49b289bdd173ec83b101f224db05c8125c6ffc38"}}],"assets":[],"attributes":[]}}
+{
+  "LSP4Metadata": {
+    "name": "LIKES Token",
+    "description": "The social token of appreciation on Forever Moments, rewarding creators and engagement",
+    "links": [
+      {
+        "title": "Forever Moments",
+        "url": "https://forevermoments.life/"
+      },
+      {
+        "title": "X (Twitter)",
+        "url": "https://x.com/momentsonchain"
+      }
+    ],
+    "images": [],
+    "icon": [
+      {
+        "width": 400,
+        "height": 400,
+        "url": "ipfs://bafkreiahe73cznyt7v6hqwp6zmua4jepdd3dpnngdagvpvaqjeevrwbgia",
+        "verification": {
+          "method": "keccak256(bytes)",
+          "data": "0x4d3ca5dbac690591cf1e5126a46d5fd00934f72aa0a5fff40069a5b389349ec4"
+        }
+      }
+    ],
+    "assets": [],
+    "attributes": [
+      {
+        "key": "Category",
+        "value": "Social"
+      },
+      {
+        "key": "Blockchain",
+        "value": "LUKSO"
+      }
+    ]
+  }
+}

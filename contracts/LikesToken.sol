@@ -50,7 +50,7 @@ contract LikesToken is LSP7Mintable {
         emit LikesPriceUpdated(oldPrice, newPrice);
     }
 
-    /// Mint Likes
+    /// Mint LIKES
     function mintLikes(address recipient) external payable {
         require(msg.value > 0, "Requires some LYX");
 

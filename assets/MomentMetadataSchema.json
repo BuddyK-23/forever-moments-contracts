@@ -5,19 +5,5 @@
     "keyType": "Singleton",
     "valueType": "bytes",
     "valueContent": "VerifiableURI"
-  },
-  {
-    "name": "MomentInteractions",
-    "key": "0x9cc389da60f5607fa8e54d5c368611a171088bd50d53947cc979b292efd967a2",
-    "keyType": "Singleton",
-    "valueType": "bytes",
-    "valueContent": "VerifiableURI"
-  },
-  {
-    "name": "FinancialMetadata",
-    "key": "0x5f9a2a3c336f207e56d80cc08d56e295a5d43b1b819463bcdfc7b9c0a403676b",
-    "keyType": "Singleton",
-    "valueType": "bytes",
-    "valueContent": "VerifiableURI"
   }
 ] 

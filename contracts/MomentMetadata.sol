@@ -13,8 +13,7 @@ import {LSP1Utils} from "@lukso/lsp1-contracts/contracts/LSP1Utils.sol";
 import {LSP2Utils} from "@lukso/lsp2-contracts/contracts/LSP2Utils.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-
-// constants
+// Constants
 import {
     _INTERFACEID_LSP1,
     _INTERFACEID_LSP1_DELEGATE,
@@ -28,69 +27,47 @@ import {
 } from "@lukso/lsp0-contracts/contracts/LSP0Constants.sol";
 
 contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
-    // Custom data key constants
     bytes32 public constant _MOMENT_METADATA_KEY = 0x3569795c73940696ea152d91d7bf7a2a1543fcf430ff086ba45e1de82f924e81;
-    bytes32 public constant TYPE_ID_LIKES = 0x20804611b3e2ea21c480dc465142210acf4a2485947541770ec1fb87dee4a55c;
     bytes32 public constant TYPE_ID_LSP7_RECEIVED = 0x20804611b3e2ea21c480dc465142210acf4a2485947541770ec1fb87dee4a55c;
 
-    // LIKES Tracking
     LSP7DigitalAsset public likesToken;
     address public collectionOwner;
     uint256 public totalLikesWithdrawn;
-
-    // Add the constant URD address
     address public immutable MOMENT_URD;
 
-    // Event emitted when metadata is updated
+    // Events
     event LSP4MetadataUpdated(bytes32 indexed tokenId, bytes metadataURI, string description);
     event MetadataUpdated(bytes32 indexed tokenId, bytes metadataURI, string description);
     event LikesWithdrawn(address indexed owner, uint256 amount);
 
     constructor(
-        address momentOwner, 
-        address momentFactory, 
-        bytes memory metadataURI, 
-        bytes memory LSP4MetadataURI,
+        address _momentOwner, 
+        address _momentFactory, 
+        bytes memory _metadataURI, 
+        bytes memory _LSP4MetadataURI,
         address _likesToken,
         address _collectionOwner,
         address _momentURD
-    ) ERC725Y(momentOwner) {
+    ) ERC725Y(_momentOwner) {
         MOMENT_URD = _momentURD;
         _setData(
             _LSP8_REFERENCE_CONTRACT,
-            abi.encodePacked(momentFactory, bytes32(bytes20(address(this))))
+            abi.encodePacked(_momentFactory, bytes32(bytes20(address(this))))
         );
 
-        // Store metadata
-        _setData(_MOMENT_METADATA_KEY, metadataURI);
-        _setData(_LSP4_METADATA_KEY, LSP4MetadataURI);
+        _setData(_MOMENT_METADATA_KEY, _metadataURI);
+        _setData(_LSP4_METADATA_KEY, _LSP4MetadataURI);
 
-        // Set Likes Token
         likesToken = LSP7DigitalAsset(payable(_likesToken));
         collectionOwner = _collectionOwner;
 
-        // Set the type-specific URD for LSP7
         bytes32 key = LSP2Utils.generateMappingKey(
             _LSP1_UNIVERSAL_RECEIVER_DELEGATE_PREFIX,
             bytes20(TYPE_ID_LSP7_RECEIVED)
         );
         _setData(key, abi.encodePacked(MOMENT_URD));
-
-        // Set the default URD
-        // _setData(
-        //     _LSP1_UNIVERSAL_RECEIVER_DELEGATE_KEY,
-        //     abi.encodePacked(MOMENT_URD)
-        // );
-
-        // Set LSP4Creators
-        bytes32 LSP4_CREATORS_ARRAY_KEY = 0x114bd03b3a46d48759680d81ebb2b414fda7d030a7105a851867accf1c2352e7;
-        _setData(
-            LSP4_CREATORS_ARRAY_KEY, 
-            abi.encodePacked(momentOwner)  // Add the moment owner as creator
-        );
     }
 
-    // --- ERC165 Compliance ---
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return 
             interfaceId == type(ILSP1UniversalReceiver).interfaceId || 
@@ -101,7 +78,6 @@ contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
         bytes32 typeId,
         bytes memory receivedData
     ) public payable virtual override returns (bytes memory returnedValues) {
-        // Handle native token reception first
         if (msg.value != 0 && typeId != _TYPEID_LSP0_VALUE_RECEIVED) {
             universalReceiver(_TYPEID_LSP0_VALUE_RECEIVED, receivedData);
         }
@@ -109,7 +85,6 @@ contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
         bytes memory resultDefaultDelegate;
         bytes memory resultTypeIdDelegate;
 
-        // 1. Call Default URD first
         bytes memory defaultURDValue = _getData(_LSP1_UNIVERSAL_RECEIVER_DELEGATE_KEY);
         if (defaultURDValue.length >= 20) {
             address defaultURD = address(bytes20(defaultURDValue));
@@ -119,7 +94,6 @@ contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
             }
         }
 
-        // 2. Then call type-specific URD
         bytes32 typeIdKey = LSP2Utils.generateMappingKey(
             _LSP1_UNIVERSAL_RECEIVER_DELEGATE_PREFIX,
             bytes20(typeId)
@@ -133,7 +107,6 @@ contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
             }
         }
 
-        // Return combined results
         returnedValues = abi.encode(resultDefaultDelegate, resultTypeIdDelegate);
         emit UniversalReceiver(msg.sender, msg.value, typeId, receivedData, returnedValues);
         return returnedValues;
@@ -150,7 +123,7 @@ contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
         emit MetadataUpdated(tokenId, metadataURI, "Metadata updated");
     }
 
-    // --- Likes ---
+    // --- LIKES ---
     function withdrawLikes(uint256 amount) external {
         require(msg.sender == owner(), "Only owner can withdraw");
         require(amount > 0, "Amount must be greater than 0");
@@ -165,17 +138,6 @@ contract MomentMetadata is ERC725Y, ILSP1UniversalReceiver {
 
     function getWithdrawnLikes() external view returns (uint256) {
         return totalLikesWithdrawn;
-    }
-
-    // Add this helper function to verify the mapping
-    function getURDForTypeId(bytes32 typeId) external view returns (address) {
-        bytes32 key = LSP2Utils.generateMappingKey(
-            _LSP1_UNIVERSAL_RECEIVER_DELEGATE_PREFIX,
-            bytes20(typeId)
-        );
-        bytes memory value = _getData(key);
-        require(value.length >= 20, "No URD set for this typeId");
-        return address(bytes20(value));
     }
 }
 

@@ -17,16 +17,15 @@ contract MomentURD is IERC165, ILSP1UniversalReceiverDelegate {
         uint256 timestamp;
     }
     
-    // Mapping: moment address => array of likes
+    // Mapping: Moment address => array of likes
     mapping(address => Like[]) public momentLikes;
 
     function universalReceiverDelegate(
-        address sender,
-        uint256 value,
-        bytes32 typeId,
+        address /*sender*/,
+        uint256 /*value*/,
+        bytes32 /*typeId*/,
         bytes memory data
     ) public override returns (bytes memory) {
-        // Decode LSP7 transfer data
         (
             address from,
             address operator,

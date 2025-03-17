@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// Import LUKSO Standards
+// Imports
 import {LSP8Mintable} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/presets/LSP8Mintable.sol";
+import {LSP6Utils} from "@lukso/lsp-smart-contracts/contracts/LSP6KeyManager/LSP6Utils.sol";
+import {LSP2Utils} from "@lukso/lsp2-contracts/contracts/LSP2Utils.sol";
 import {_LSP8_TOKENID_FORMAT_ADDRESS} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/LSP8Constants.sol";
 import {_LSP4_TOKEN_TYPE_COLLECTION, _LSP4_METADATA_KEY} from "@lukso/lsp-smart-contracts/contracts/LSP4DigitalAssetMetadata/LSP4Constants.sol";
-import "@erc725/smart-contracts/contracts/interfaces/IERC725Y.sol";
-import {LSP6Utils} from "@lukso/lsp-smart-contracts/contracts/LSP6KeyManager/LSP6Utils.sol";
 import {_PERMISSION_CALL} from "@lukso/lsp-smart-contracts/contracts/LSP6KeyManager/LSP6Constants.sol";
-import {LSP2Utils} from "@lukso/lsp2-contracts/contracts/LSP2Utils.sol";
-
-import "./MomentMetadata.sol";
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {IERC725Y} from "@erc725/smart-contracts/contracts/interfaces/IERC725Y.sol";
+import {MomentMetadata} from "./MomentMetadata.sol";
 
 
 contract MomentFactory is LSP8Mintable {
@@ -19,18 +18,13 @@ contract MomentFactory is LSP8Mintable {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // --- Constants
-    address public constant LIKES_TOKEN = 0x97FC281993126249D7b875a531267Cea17B50B48;
+    address public constant LIKES_TOKEN = 0x403BfD53617555295347e0F7725CfdA480AB801e;
 
     // --- Events
     event MomentMinted(address indexed recipient, bytes32 indexed tokenId, address indexed collectionUP, string description);
     event CollectionCreated(address indexed owner, address indexed collectionUP);
     event CollectionRemoved(address indexed owner, address indexed collectionUP);
-    event PermissionsCheck(
-        address indexed recipient,
-        address indexed collectionUP,
-        bytes32 permissionsKey,
-        bytes permissions
-    );
+    event PermissionsCheck(address indexed recipient, address indexed collectionUP, bytes32 permissionsKey, bytes permissions);
     event MomentURDUpdated(address indexed oldURD, address indexed newURD);
 
     // --- Storage
@@ -39,8 +33,6 @@ contract MomentFactory is LSP8Mintable {
     mapping(address => address) private _collectionToOwner; // Mapping from collectionUP to ownerUP
     mapping(address => EnumerableSet.Bytes32Set) private _collectionMoments; // Mapping from collectionUP to set of tokenIds
     mapping(address => EnumerableSet.AddressSet) private _ownerToCollections; // Mapping from ownerUP to set of collectionUPs
-
-    // Add URD address as state variable
     address public momentURD;
 
     constructor(
@@ -72,35 +64,23 @@ contract MomentFactory is LSP8Mintable {
     // Store new Collection
     function storeCollection(address collectionUP, address controllerUP, address ownerUP) external {
         require(msg.sender == controllerUP, "Caller must be the owner of the collection");
-
-        // Ensure the collectionUP hasn't already been added
         require(_collectionToOwner[collectionUP] == address(0), "Collection already exists");
 
-        // Map the collectionUP to the ownerUP
         _collectionToOwner[collectionUP] = ownerUP;
-
-        // Add the collectionUP to the set of collections for the ownerUP
         _ownerToCollections[ownerUP].add(collectionUP);
-
-        // Add the collectionUP to the global set of all collections
         _allCollections.add(collectionUP);
 
-        // Emit an event for transparency
         emit CollectionCreated(ownerUP, collectionUP);
     }
 
     // Remove a Collection from storage
     function removeCollection(address collectionUP) external onlyOwner {
         require(_collectionToOwner[collectionUP] != address(0), "Collection does not exist");
-        
-        // Get the owner before removing
         address ownerUP = _collectionToOwner[collectionUP];
 
-        // Remove from all mappings and sets
         _ownerToCollections[ownerUP].remove(collectionUP);
         _allCollections.remove(collectionUP);
         delete _collectionToOwner[collectionUP];
-        
         // Note: We keep the _collectionMoments mapping data for historical reference
         
         emit CollectionRemoved(ownerUP, collectionUP);
@@ -118,36 +98,31 @@ contract MomentFactory is LSP8Mintable {
 
         // Check if recipient is owner or has permissions
         if (recipient != collectionOwnerUP) {
-            // Get permissions using LSP6Utils
             bytes32 permissions = LSP6Utils.getPermissionsFor(
                 IERC725Y(collectionUP),
                 recipient
             );
 
-            // Check CALL permission
             require(
                 LSP6Utils.hasPermission(permissions, _PERMISSION_CALL),
                 "Missing CALL permission"
             );
 
-            // Get allowed calls using LSP6Utils
             bytes memory allowedCalls = LSP6Utils.getAllowedCallsFor(
                 IERC725Y(collectionUP),
                 recipient
             );
 
-            // Verify it's in the correct LSP6 format
             require(
                 LSP6Utils.isCompactBytesArrayOfAllowedCalls(allowedCalls),
                 "Invalid allowed calls format"
             );
 
-            // Check if this specific function call is allowed
             bytes memory expectedCall = abi.encodePacked(
-                bytes4(0x00000002),    // CALL permission
-                address(this),         // this contract
-                bytes4(0xffffffff),    // any interface ID
-                msg.sig                // function selector
+                bytes4(0x00000002),
+                address(this),
+                bytes4(0xffffffff),
+                msg.sig
             );
 
             bool hasAllowedCall = false;
@@ -174,7 +149,7 @@ contract MomentFactory is LSP8Mintable {
             require(hasAllowedCall, "Not allowed to call mintMoment");
         }
 
-        // Create new moment
+        // Create new Moment
         MomentMetadata newContract = new MomentMetadata(
             recipient,
             address(this),
@@ -187,23 +162,17 @@ contract MomentFactory is LSP8Mintable {
 
         bytes32 tokenId = bytes32(uint256(uint160(address(newContract))));
         
-        // Mint the token
         _mint(recipient, tokenId, true, "");
         _setDataForTokenId(tokenId, _LSP4_METADATA_KEY, LSP4_metadataURI);
-
-        // Store the moment address
         _allMoments.add(address(newContract));
-
-        // Add the tokenId to the collection's set
         _collectionMoments[collectionUP].add(tokenId);
 
-        // Emit event
         emit MomentMinted(recipient, tokenId, collectionUP, "Moment minted");
 
         return tokenId;
     }
 
-    // Add function to update URD
+    // Update Universal Receiver Delegate
     function setMomentURD(address newURD) external onlyOwner {
         require(newURD != address(0), "Invalid URD address");
         address oldURD = momentURD;
@@ -233,7 +202,7 @@ contract MomentFactory is LSP8Mintable {
         return _collectionToOwner[collectionUP] == ownerUP;
     }
 
-    // Get all moments in a collection
+    // Get all Moments in a collection
     function getMomentsInCollection(address collectionUP) external view returns (bytes32[] memory) {
         return _collectionMoments[collectionUP].values();
     }
@@ -248,12 +217,12 @@ contract MomentFactory is LSP8Mintable {
         return _ownerToCollections[ownerUP].length();
     }
 
-    // Get the total number of moments in a collection
+    // Get the total number of Moments in a collection
     function getMomentCountInCollection(address collectionUP) external view returns (uint256) {
         return _collectionMoments[collectionUP].length();
     }
 
-    // Add a view function to get all moments
+    // Add a view function to get all Moments
     function getAllMoments() external view returns (address[] memory) {
         return _allMoments.values();
     }

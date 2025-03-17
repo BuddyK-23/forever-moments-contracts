@@ -1,1 +1,42 @@
-{"LSP4Metadata":{"name":"Factory","description":"This is the factory for the Moment Factory","links":[{"title":"X","url":"https://x.com/momentsonchain"},{"title":"Forever Moments","url":"https://forever-moments.vercel.app/"}],"images":[[{"width":1024,"height":403,"url":"ipfs://bafybeicyadwpetswabs4fu2rvdte2ywd6uykrsoamcpnpl7gfw552fplpe","verification":{"method":"keccak256(bytes)","data":"0xaef20363093b6b7ef274dc244c3c4d43889a867b3fd5f721e3bf89093571e787"}}]],"icon":[{"width":400,"height":400,"url":"ipfs://bafkreidwcu43owrs456e3njadnb3rim6su3g7yexha35gw7nikhvivipiy","verification":{"method":"keccak256(bytes)","data":"0x4f8546d7fd4c0d95762a3f09fd40c98a5a05f628a3bee8a943c91936e0bf5cf9"}}],"assets":[],"attributes":[]}}
+{
+  "LSP4Metadata": {
+    "name": "Moment Factory",
+    "description": "The heart of Forever Moments – where digital memories come to life and are securely stored on the LUKSO blockchain.",
+    "links": [
+      {
+        "title": "X (Twitter)",
+        "url": "https://x.com/momentsonchain"
+      },
+      {
+        "title": "Forever Moments",
+        "url": "https://forevermoments.life/"
+      }
+    ],
+    "images": [
+      [
+        {
+          "width": 1024,
+          "height": 403,
+          "url": "ipfs://bafybeicyadwpetswabs4fu2rvdte2ywd6uykrsoamcpnpl7gfw552fplpe",
+          "verification": {
+            "method": "keccak256(bytes)",
+            "data": "0xaef20363093b6b7ef274dc244c3c4d43889a867b3fd5f721e3bf89093571e787"
+          }
+        }
+      ]
+    ],
+    "icon": [
+      {
+        "width": 400,
+        "height": 400,
+        "url": "ipfs://bafkreidwcu43owrs456e3njadnb3rim6su3g7yexha35gw7nikhvivipiy",
+        "verification": {
+          "method": "keccak256(bytes)",
+          "data": "0x4f8546d7fd4c0d95762a3f09fd40c98a5a05f628a3bee8a943c91936e0bf5cf9"
+        }
+      }
+    ],
+    "assets": [],
+    "attributes": []
+  }
+}

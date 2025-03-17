@@ -1,58 +1,100 @@
-# Build Your First NFT Collection on LUKSO - Munchkins Collection
+# Forever Moments - Social NFT Platform on LUKSO
 
-A cute collection of Munchkins NFTs on LUKSO using [LSP8](https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset/).
+A decentralized social platform built on LUKSO that enables creators to mint, share, and engage with digital moments as LSP8 tokens. The platform features social interactions through LIKES tokens and collection management capabilities.
 
-<img src='./assets/collection.png'
-alt="Munchkins"
-width="400" />
+## Features
 
-# Prerequisites
+- **Moment Creation**: Mint LSP8 tokens representing digital moments with rich metadata
+- **Collection Management**: Create and manage collections of moments
+- **Social Interactions**: Like and comment on moments using LIKES tokens
+- **Open Collections**: Join public collections and contribute moments
+- **Universal Profile Integration**: Full integration with LUKSO's Universal Profile system
 
-1.  Node.js - you can install Node using either [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm)
-2.  [The Universal Profile Browser Extension](https://docs.lukso.tech/install-up-browser-extension)
-3.  [A Universal Profile address](https://my.universalprofile.cloud/)
+## Smart Contracts
 
-## Run Locally
+- `MomentFactory.sol`: Core factory contract for minting moments and managing collections
+- `MomentMetadata.sol`: Handles metadata storage and updates for moments
+- `LikesToken.sol`: LSP7 token implementation for social interactions
+- `MomentURD.sol`: Universal Receiver Delegate for handling likes and comments
+- `OpenCollectionManager.sol`: Manages open/public collections
+- `CollectionMemberships.sol`: Handles collection membership and permissions
 
-1. Clone the repo
+## Prerequisites
 
+1. Node.js (via [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm))
+2. [Universal Profile Browser Extension](https://docs.lukso.tech/install-up-browser-extension)
+3. [LUKSO Universal Profile](https://my.universalprofile.cloud/)
+4. [LUKSO testnet LYX](https://faucet.testnet.lukso.network)
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   cd forever-moments
    ```
-   git clone https://github.com/biancabuzea200/NFT-Collection-LUKSO.git`
-   ```
 
-2. Install the dependencies
-
-   ```
+2. Install dependencies:
+   ```bash
    npm install
    ```
 
-3. Rename the .env.example file to .env and add your secrets
-
-4. Compile the contract
-
-   ```
-   npx hardhat compile
+3. Configure environment:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
    ```
 
-5. Deploy the smart contract on LUKSO Testnet
+## Deployment
 
-   ```
-   npx hardhat run scripts/deploy.ts --network lukso_testnet
-   ```
-
-6. Upload each media file (icon, pictures, etc.) to IPFS and get their CIDs, and create an LSP4 Metadata JSON file
-
-   ```
-   npx hardhat run scripts/generateMetadataJSON.ts --network lukso_testnet
+1. Compile contracts:
+   ```bash
+   npm run build
    ```
 
-7. Encode the LSP4 Metadata JSON file URL as a VerifiableURI
+2. Deploy to LUKSO testnet:
+   ```bash
+   npm run deploy:testnet
+   ```
 
-   ```
-   npx hardhat run scripts/updateTokenIdMetadata.ts --network lukso_testnet
+3. Generate and upload metadata:
+   ```bash
+   npm run generate-metadata
    ```
 
-8. Mint your NFT
+4. Update token metadata:
+   ```bash
+   npm run update-metadata:testnet
    ```
-   npx hardhat run scripts/minttokenId.ts --network lukso_testnet
+
+5. Mint tokens:
+   ```bash
+   npm run mint-token-id:testnet
    ```
+
+## Testing
+
+Run the test suite:
+
+```bash
+npx hardhat test
+```
+
+## Documentation
+
+- [LUKSO Technical Documentation](https://docs.lukso.tech)
+- [LSP8 Standard](https://docs.lukso.tech/standards/tokens/LSP8-Identifiable-Digital-Asset)
+- [LSP7 Standard](https://docs.lukso.tech/standards/tokens/LSP7-Digital-Asset)
+
+## Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) first.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- Twitter: [@momentsonchain](https://twitter.com/momentsonchain)
+- Website: [forevermoments.life](https://forevermoments.life)
