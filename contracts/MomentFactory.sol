@@ -31,8 +31,9 @@ contract MomentFactory is LSP8Mintable {
     EnumerableSet.AddressSet private _allCollections;
     EnumerableSet.AddressSet private _allMoments;
     mapping(address => address) private _collectionToOwner; // Mapping from collectionUP to ownerUP
-    mapping(address => EnumerableSet.Bytes32Set) private _collectionMoments; // Mapping from collectionUP to set of tokenIds
+    mapping(address => EnumerableSet.Bytes32Set) private _collectionMoments; // Mapping from collectionUP to set of Moments
     mapping(address => EnumerableSet.AddressSet) private _ownerToCollections; // Mapping from ownerUP to set of collectionUPs
+    mapping(address => address) private _momentToCollection; // Mapping from Moment to Collection
     address public momentURD;
 
     constructor(
@@ -161,6 +162,8 @@ contract MomentFactory is LSP8Mintable {
         );
 
         bytes32 tokenId = bytes32(uint256(uint160(address(newContract))));
+    
+        _momentToCollection[address(newContract)] = collectionUP;
         
         _mint(recipient, tokenId, true, "");
         _setDataForTokenId(tokenId, _LSP4_METADATA_KEY, LSP4_metadataURI);
@@ -180,7 +183,7 @@ contract MomentFactory is LSP8Mintable {
         emit MomentURDUpdated(oldURD, newURD);
     }
 
-    // --- View Functions
+    // View Functions
 
     // Get all collections
     function getAllCollections() external view returns (address[] memory) {
@@ -225,5 +228,10 @@ contract MomentFactory is LSP8Mintable {
     // Add a view function to get all Moments
     function getAllMoments() external view returns (address[] memory) {
         return _allMoments.values();
+    }
+
+    // Add a getter function to look up a Moment's collection
+    function getMomentCollection(address momentAddress) external view returns (address) {
+        return _momentToCollection[momentAddress];
     }
 }
