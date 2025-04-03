@@ -1,9 +1,0 @@
-[
-  {
-    "name": "MomentMetadata",
-    "key": "0x3569795c73940696ea152d91d7bf7a2a1543fcf430ff086ba45e1de82f924e81",
-    "keyType": "Singleton",
-    "valueType": "bytes",
-    "valueContent": "VerifiableURI"
-  }
-] 
